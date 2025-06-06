@@ -1,4 +1,4 @@
-package com.Code_With_Danuka.controler;
+package com.Code_With_Danuka.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
