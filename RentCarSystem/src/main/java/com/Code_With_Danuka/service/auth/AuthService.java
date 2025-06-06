@@ -1,12 +1,10 @@
 package com.Code_With_Danuka.service.auth;
 
-import org.apache.catalina.authenticator.SavedRequest;
-
-import com.Code_With_Danuka.dto.SingupRequest;
-import com.Code_With_Danuka.dto.UserDto;
+import com.Code_With_Danuka.dto.SignupRequest;
+import com.Code_With_Danuka.dto.AuthResponse;
 
 
 
 public interface AuthService {
-    UserDto createCustomer(SingupRequest signupRequest);
+    AuthResponse createCustomer(SignupRequest signupRequest);
 }

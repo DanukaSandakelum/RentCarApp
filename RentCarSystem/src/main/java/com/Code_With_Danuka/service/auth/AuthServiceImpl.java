@@ -1,37 +1,40 @@
 package com.Code_With_Danuka.service.auth;
-import com.Code_With_Danuka.repostory.userRepostory;
+
+import com.Code_With_Danuka.dto.SignupRequest;
+import com.Code_With_Danuka.dto.AuthResponse;
+import com.Code_With_Danuka.entity.User;
+import com.Code_With_Danuka.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
-
-
-
-import com.Code_With_Danuka.dto.SingupRequest;
-import com.Code_With_Danuka.dto.UserDto;
-import com.Code_With_Danuka.entity.User;
-import com.Code_With_Danuka.enums.UserRole;
-
 @Service
-
-
-
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
-    private final userRepostory userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtProvider jwtProvider;
 
     @Override
-    public UserDto createCustomer(SingupRequest signupRequest) {
-        User newUser = new User();
-        newUser.setName(signupRequest.getName());
-        newUser.setEmail(signupRequest.getEmail());
-        newUser.setPassword(signupRequest.getPassword());
-        newUser.setUserRole( UserRole.CUSTOMER);
-        User createdUser = userRepository.save(newUser);
+    public AuthResponse createCustomer(SignupRequest signupRequest) {
+        if (signupRequest.getUsername() == null || signupRequest.getPassword() == null) {
+            throw new IllegalArgumentException("Username and password cannot be null");
+        }
 
-        UserDto userDto = new UserDto();
-        userDto.setId(createdUser.getId());
-        return userDto;
+        User user = User.builder()
+                .username(signupRequest.getUsername())
+                .password(passwordEncoder.encode(signupRequest.getPassword()))
+                .role("CUSTOMER")
+                .build();
+
+        User savedUser = userRepository.save(user);
+        String jwt = jwtProvider.generateToken(user);
+
+        return AuthResponse.builder()
+                .id(savedUser.getId())
+                .username(savedUser.getUsername())
+                .role(savedUser.getRole())
+                .token(jwt)
+                .build();
     }
-
 }
